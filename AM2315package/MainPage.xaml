@@ -9,6 +9,22 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontSize="40">AM2315 test</TextBlock>
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <TextBlock FontSize="40">Humidity</TextBlock>
+            <TextBox Name="txt_Humidity" Grid.Row="1" FontSize="40"></TextBox>
+            <TextBlock FontSize="40">Temperature</TextBlock>
+            <TextBox Name="txt_Temperature" Grid.Row="1" FontSize="40"></TextBox>
+        </StackPanel>
 
     </Grid>
 </Page>

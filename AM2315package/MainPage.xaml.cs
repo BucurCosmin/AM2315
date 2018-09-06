@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AM2315package.AM2315;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,9 +23,20 @@ namespace AM2315package
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private AM2315sensor AM2315;
+        private float[] values;
         public MainPage()
         {
             this.InitializeComponent();
+            values = new float[2];
+            AM2315 = new AM2315sensor(0x5C);
+            ConfigureAndReadAsync();
+        }
+
+        private async System.Threading.Tasks.Task ConfigureAndReadAsync()
+        {
+            int ret = await AM2315.Connect();
+            values = await AM2315.ReadData();
         }
     }
 }
