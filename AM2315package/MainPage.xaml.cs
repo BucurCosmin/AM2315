@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using System.Timers;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -30,13 +32,28 @@ namespace AM2315package
             this.InitializeComponent();
             values = new float[2];
             AM2315 = new AM2315sensor(0x5C);
-            ConfigureAndReadAsync();
+            Configure();
+            Timer t1 = new Timer(1000);
+            t1.Elapsed += async (sender, e) => await ReadSensor();
+            t1.Start();
         }
 
-        private async System.Threading.Tasks.Task ConfigureAndReadAsync()
+        private async Task ReadSensor()
+        {
+            values = await AM2315.ReadData();
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,()=>
+            {
+                txt_Humidity.Text = AM2315.humidity.ToString();
+                txt_Temperature.Text = AM2315.temperature.ToString();
+                txt_Message.Text = AM2315.message;
+            });
+
+        }
+
+        private async System.Threading.Tasks.Task Configure()
         {
             int ret = await AM2315.Connect();
-            values = await AM2315.ReadData();
         }
+
     }
 }

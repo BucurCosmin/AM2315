@@ -21,9 +21,10 @@
         <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontSize="40">AM2315 test</TextBlock>
         <StackPanel Grid.Column="1" Grid.Row="1">
             <TextBlock FontSize="40">Humidity</TextBlock>
-            <TextBox Name="txt_Humidity" Grid.Row="1" FontSize="40"></TextBox>
+            <TextBlock Name="txt_Humidity" Grid.Row="1" FontSize="40"></TextBlock>
             <TextBlock FontSize="40">Temperature</TextBlock>
-            <TextBox Name="txt_Temperature" Grid.Row="1" FontSize="40"></TextBox>
+            <TextBlock Name="txt_Temperature" Grid.Row="1" FontSize="40"></TextBlock>
+            <TextBlock Name="txt_Message"></TextBlock>
         </StackPanel>
 
     </Grid>

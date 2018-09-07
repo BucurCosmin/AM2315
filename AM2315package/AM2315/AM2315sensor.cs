@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.I2c;
@@ -25,8 +26,8 @@ namespace AM2315package.AM2315
             string i2cDeviceSelector = I2cDevice.GetDeviceSelector();
             IReadOnlyList<DeviceInformation> devices = await DeviceInformation.FindAllAsync(i2cDeviceSelector);
             I2cConnectionSettings devSettings = new I2cConnectionSettings(_addr);
-            devSettings.BusSpeed = I2cBusSpeed.FastMode;
-            devSettings.SharingMode = I2cSharingMode.Shared;
+            devSettings.BusSpeed = I2cBusSpeed.StandardMode;
+            devSettings.SharingMode = I2cSharingMode.Exclusive;
             _dev = await I2cDevice.FromIdAsync(devices[0].Id, devSettings);
             int ret = _dev != null ? 1 : -1;
 
@@ -35,23 +36,37 @@ namespace AM2315package.AM2315
 
         public async Task<float[]> ReadData()
         {
+            I2cTransferResult response = new I2cTransferResult();
+            int indexer = 0;
+            response.Status = I2cTransferStatus.UnknownError;
             byte[] buffer = new byte[1];
+            byte[] readreq = new byte[3];
+            readreq[0] = 0x03;
+            readreq[1] = 0x0;
+            readreq[2] = 0x04;
             byte[] readbuffer = new byte[8];
             float[] returnVals = new float[2];
+            while (response.Status!=I2cTransferStatus.FullTransfer & indexer<3)
+            {
+                response =_dev.WritePartial(buffer);
+                indexer += 1;
+            }
+            if (indexer==3)
+            {
+                message = "sensor not waking up";
+                returnVals[0] = 0;
+                returnVals[1] = 0;
+                return returnVals;
+            }
             try
             {
-                buffer[0] = 0x03;
-                _dev.Write(buffer);
-                buffer[0] = 0;
-                _dev.Write(buffer);
-                buffer[0] = 4;
-                _dev.Write(buffer);
-                await Task.Delay(10);
+                _dev.Write(readreq);
+                Thread.Sleep(20);
                 _dev.Read(readbuffer);
                 if (readbuffer[0]!=0x03 || readbuffer[1]!=4)
                 {
-                    throw new Exception("error in reply")
-                };
+                    throw new Exception("error in reply");
+                }
                 humidity = readbuffer[2];
                 humidity *= 256;
                 humidity += readbuffer[3];
